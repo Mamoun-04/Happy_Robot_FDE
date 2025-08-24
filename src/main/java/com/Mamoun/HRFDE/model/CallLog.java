@@ -9,8 +9,10 @@ import java.util.UUID;
 public class CallLog {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
+
 
     @Column(name = "mc_number")
     private String mcNumber;
@@ -26,8 +28,16 @@ public class CallLog {
     private Integer rounds;
     private String notes;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    // Let Hibernate set createdAt before insert if DB doesn't
+    @PrePersist
+    protected void onCreate() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+    }
 
     // Getters and Setters
     public UUID getId() { return id; }
